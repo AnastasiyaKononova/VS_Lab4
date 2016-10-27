@@ -15,10 +15,10 @@ struct dir_struct {
 	int id;
 	int empty;
 	int parent_id;
-	char dir_name[255];
-};
+	char dir_name[255];};
 
-void * init_callback(){
+void * init_callback()
+{
 	log_file = fopen("filesystem.log", "wb");
 	FILE* file = fopen(FILENAME, "wb");
 	

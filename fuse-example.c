@@ -152,8 +152,7 @@ int delete(int id)
 	fwrite(&buf, sizeof(struct dir_struct), 1, file);
 	fclose(file);
 	
-	fprintf(log_file, "Return 0\n");
-	
+	fprintf(log_file, "Return 0\n");	
 	fflush(log_file);
 	
 	current_dir_amount = current_dir_amount - 1;
@@ -171,8 +170,7 @@ int ren_ame(struct dir_struct *dir)
 		return -2;
 	}
 	
-	dir->empty = 0;
-	
+	dir->empty = 0;	
 	fseek(file, dir->id * sizeof(struct dir_struct), SEEK_SET);
 	fwrite(dir, sizeof(struct dir_struct), 1, file);
 	fclose(file);

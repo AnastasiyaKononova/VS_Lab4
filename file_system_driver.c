@@ -30,8 +30,7 @@ void * init_do()
 	ds.is_empty = 1;
 	ds.parent_id = -1;	
 	
-	for (i = 0; i < MAX_DIR_AMOUNT; i++) 
-	{
+	for (i = 0; i < MAX_DIR_AMOUNT; i++) {
 		ds.id = i;
 		fwrite(&ds, sizeof(struct struct_for_dir), 1, file);
 	}
@@ -44,28 +43,19 @@ void * init_do()
 	return value;
 }
 
-void destroy_do(void* private_data)
-{
-	fflush(log_file);
-	fclose(log_file);
-}
-
 int dir_find(const char* dir, int parent)
 {
 	struct struct_for_dir ds;
 	FILE* file = fopen(FILENAME, "rb");
 	
-	if (file == NULL) 
-	{
+	if (file == NULL) {
 		return -2;
 	}
 	
 	memset(&ds, 0, sizeof(struct struct_for_dir));
 
-	while(!feof(file) && fread(&ds, sizeof(struct struct_for_dir), 1, file) > 0) 
-	{
-		if (ds.is_empty == 0 && ds.parent_id == parent && strcmp(ds.name_dir, dir) == 0) 
-		{
+	while(!feof(file) && fread(&ds, sizeof(struct struct_for_dir), 1, file) > 0) {
+		if (ds.is_empty == 0 && ds.parent_id == parent && strcmp(ds.name_dir, dir) == 0) {
 			fclose(file);
 			return ds.id;
 		}
@@ -80,8 +70,7 @@ int dir_find_child(struct struct_for_dir *child, int parent, int offset)
 {
 	FILE* file = fopen(FILENAME, "rb");
 	
-	if (file == NULL) 
-	{
+	if (file == NULL) {
 		fprintf(log_file, "--Cannot read file. Exit from dir_find_child\n");
 		fflush(log_file);
 		return -2;
@@ -91,17 +80,14 @@ int dir_find_child(struct struct_for_dir *child, int parent, int offset)
 	memset(child, 0, sizeof(struct struct_for_dir));
 	int counter = 0;
 	
-	while(!feof(file) && fread(child, sizeof(struct struct_for_dir), 1, file) > 0) 
-	{
+	while(!feof(file) && fread(child, sizeof(struct struct_for_dir), 1, file) > 0) {
 		counter ++;
-		if (counter % 50 == 0) 
-		{
+		if (counter % 50 == 0) {
 			fprintf(log_file, "Read %d\n", counter);
 			fflush(log_file);
 		}
 	
-		if (child->is_empty == 0 && child->parent_id == parent) 
-		{
+		if (child->is_empty == 0 && child->parent_id == parent) {
 			fprintf(log_file, "Return %d\n", child->id);
 			fflush(log_file);
 			fclose(file);
@@ -123,10 +109,8 @@ int dir_add(struct struct_for_dir *dir)
 	
 	memset(&ds, 0, sizeof(struct struct_for_dir));
 	
-	while(!feof(file) && fread(&ds, sizeof(struct struct_for_dir), 1, file) > 0) 
-	{
-		if (ds.is_empty) 
-		{
+	while(!feof(file) && fread(&ds, sizeof(struct struct_for_dir), 1, file) > 0) {
+		if (ds.is_empty) {
 			fseek(file, ds.id * sizeof(struct struct_for_dir), SEEK_SET);
 			dir->id = ds.id;
 			fwrite(dir, sizeof(struct struct_for_dir), 1, file);
@@ -147,15 +131,13 @@ int dir_add(struct struct_for_dir *dir)
 int dir_delete(int id)
 {
 	FILE* file = fopen(FILENAME, "rb+");
+	struct struct_for_dir buf;
 	
-	if (file == NULL) 
-	{
+	if (file == NULL) {
 		fprintf(log_file, "Cannot read file. Exit from dir_find_child\n");
 		fflush(log_file);
 		return -2;
 	}
-	
-	struct struct_for_dir buf;
 	
 	buf.id = id;
 	buf.is_empty = 1;
@@ -176,8 +158,7 @@ int dir_rename(struct struct_for_dir *dir)
 {
 	FILE* file = fopen(FILENAME, "rb+");
 	
-	if (file == NULL) 
-	{
+	if (file == NULL) {
 		fprintf(log_file, "Cannot read file. Exit from dir_find_child\n");
 		fflush(log_file);
 		return -2;
@@ -188,8 +169,7 @@ int dir_rename(struct struct_for_dir *dir)
 	fwrite(dir, sizeof(struct struct_for_dir), 1, file);
 	fclose(file);
 	
-	fprintf(log_file, "	Return 0\n");
-	
+	fprintf(log_file, "	Return 0\n");	
 	fflush(log_file);
 	
 	return 0;
@@ -201,31 +181,25 @@ int find_dir_by_path(const char* path)
 	char *endp = NULL;
 	int start = 1, end = 0, len = strlen(path), parent = -1, id = -1;
 
-	if (strcmp("/", path) == 0) 
-	{
+	if (strcmp("/", path) == 0) {
 		return -1;
 	} 
-	else 
-	{
-		while(start <= len - 1) 
-		{
+	else {
+		while(start <= len - 1) {
 			endp = strchr(path + start, '/');
-			if(endp == NULL) 
-			{
+			if(endp == NULL) {
 				memset(subdir, 0, 255);
 				strcpy(subdir, path + start);
 				end = len - start;
-				
+			
 			} 
-			else 
-			{
+			else {
 				end = endp - path - start;
 				memset(subdir, 0, 255);
 				strncpy(subdir, path + start, end);
 			}
 			id = dir_find(subdir, parent);
-			if (id < -1) 
-			{
+			if (id < -1) {
 				return -2;
 			}
 			parent = id;
@@ -242,18 +216,14 @@ int find_dir_by_parent(const char* path, struct struct_for_dir *ds)
 	char *endp = NULL;
 	int start = 1, end = 0, len = strlen(path), parent = -1, id = -1;
 	
-	if (strcmp("/", path) == 0) 
-	{
+	if (strcmp("/", path) == 0) {
 		fprintf(log_file, "Exit from mkdir 1: return 0\n");
 		return -1;
 	} 
-	else 
-	{
-		while(start <= len - 1) 
-		{
+	else {
+		while(start <= len - 1) {
 			endp = strchr(path + start, '/');
-			if(endp == NULL) 
-			{
+			if(endp == NULL) {
 				memset(subdir, 0, 255);
 				strcpy(subdir, path + start);
 				break;
@@ -262,8 +232,8 @@ int find_dir_by_parent(const char* path, struct struct_for_dir *ds)
 			memset(subdir, 0, 255);
 			strncpy(subdir, path + start, end);
 			id = dir_find(subdir, parent);
-			if (id < -1) 
-			{
+
+			if (id < -1) {
 				return -2;
 			}
 			parent = id;
@@ -281,7 +251,6 @@ int find_dir_by_parent(const char* path, struct struct_for_dir *ds)
 	return 0;
 }
 
-
 static int getattr_do(const char *path, struct stat *stbuf) 
 {
   	fprintf(log_file, "----Enter to getattr\n");
@@ -295,13 +264,11 @@ static int getattr_do(const char *path, struct stat *stbuf)
 	fflush(log_file);
 	id = find_dir_by_path(path);
 	
-	if (id < -1) 
-	{
+	if (id < -1) {
 		return -ENOENT;
 	}
 	
-	if (id == -1) 
-	{
+	if (id == -1) {
 		stbuf->st_mode = S_IFDIR | 0755;
 		stbuf->st_nlink = 2;
 		fprintf(log_file, "----Exit from getattr1: return 0\n");
@@ -327,18 +294,15 @@ int rmdir_do(const char* path)
 	fflush(log_file);
 	id = find_dir_by_path(path);
 	
-	if (id < -1) 
-	{
+	if (id < -1) {
 		return -ENOENT;
 	}
 	
-	if (id == -1) 
-	{
+	if (id == -1) {
 		return -EBUSY;
 	}
 	
-	if (dir_find_child(&ds, id, 0) > -1) 
-	{
+	if (dir_find_child(&ds, id, 0) > -1) {
     		return -ENOTEMPTY;
     	}
 	
@@ -349,8 +313,7 @@ int rmdir_do(const char* path)
 
 int mkdir_do(const char* path, mode_t mode)
 {
-	if (amount_dir == MAX_DIR_AMOUNT) 
-	{
+	if (amount_dir == MAX_DIR_AMOUNT) {
 		return -ENOSPC;
 	}
 	
@@ -364,12 +327,10 @@ int mkdir_do(const char* path, mode_t mode)
 	fprintf(log_file, "path len: %d\n", len);
 	fflush(log_file);
 	res = find_dir_by_parent(path, &ds);
-	if (res == -1) 
-	{
+	if (res == -1) {
 		return 0;
 	}
-	if (res < -1) 
-	{
+	if (res < -1) {
 		return -ENOENT;
 	}
 	fprintf(log_file, "---Add directory: %d\n", dir_add(&ds));
@@ -378,55 +339,65 @@ int mkdir_do(const char* path, mode_t mode)
 	return 0;
 }
 
+int readdir_do(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi)
+{
+	struct struct_for_dir ds;
+	int id = -1, ofst = 0;
+	id = find_dir_by_path(path);
+	if (id < -1) {
+		return -ENOENT;
+	}
+	filler(buf, ".", NULL, 0);
+    	filler(buf, "..", NULL, 0);
+    	while ((ofst = dir_find_child(&ds, id, ofst)) > -1) {
+    		fflush(log_file);
+    		filler(buf, ds.name_dir, NULL, 0);
+    	}
+    	fflush(log_file);
+	return 0;
+}
+
 int rename_do(const char* from, const char* to)
 {
 	struct struct_for_dir ds;
 	int from_id = -2, to_id = -2, res = 0;
 	
-	if (strcmp(from, to) == 0) 
-	{
+	if (strcmp(from, to) == 0) {
 		return 0;
 	}
 	
 	from_id = find_dir_by_path(from);
 	
-	if (from_id == -1) 
-	{
+	if (from_id == -1) {
 		return -EACCES;
 	}
 	
-	if (from_id < -1) 
-	{
+	if (from_id < -1) {
 		return -ENOENT;
 	}
 	
 	to_id = find_dir_by_path(to);
 	
-	if (to_id == -1) 
-	{
+	if (to_id == -1) {
 		return -EBUSY;
 	}
-	if (to_id > -1 && dir_find_child(&ds, to_id, 0) > -1) 
-	{
+	if (to_id > -1 && dir_find_child(&ds, to_id, 0) > -1){
 		return -ENOTEMPTY;
 	}
-	if (strstr(from, to) != NULL) 
-	{
+	if (strstr(from, to) != NULL) {
 		return -EINVAL;
 	}
 	
 	memset(&ds, 0, sizeof(struct struct_for_dir));
 	res = find_dir_by_parent(to, &ds);
 	
-	if (res < -1) 
-	{
+	if (res < -1) {
 		return -ENOENT;
 	}
 	
 	ds.id = from_id;
 	
-	if (to_id > -1) 
-	{
+	if (to_id > -1) {
 		dir_delete(to_id);
 	}
 	
@@ -435,24 +406,10 @@ int rename_do(const char* from, const char* to)
 	return 0;
 }
 
-int readdir_do(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi)
+void destroy_do(void* private_data)
 {
-	struct struct_for_dir ds;
-	int id = -1, ofst = 0;
-	id = find_dir_by_path(path);
-	if (id < -1) 
-	{
-		return -ENOENT;
-	}
-	filler(buf, ".", NULL, 0);
-    	filler(buf, "..", NULL, 0);
-    	while ((ofst = dir_find_child(&ds, id, ofst)) > -1) 
-	{
-    		fflush(log_file);
-    		filler(buf, ds.name_dir, NULL, 0);
-    	}
-    	fflush(log_file);
-	return 0;
+	fflush(log_file);
+	fclose(log_file);
 }
 
 static struct fuse_operations my_sys_operations = 

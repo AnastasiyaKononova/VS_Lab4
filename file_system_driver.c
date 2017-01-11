@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #define FILENAME "/tmp/MAIN"
-#define MAX_DIR_AMOUNT 1000
+#define MAX_DIR_AMOUNT 100
 
 struct struct_for_dir 
 {
